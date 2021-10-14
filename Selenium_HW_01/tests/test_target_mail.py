@@ -6,9 +6,9 @@ from Selenium_HW_01.UI.locators.basic_locators import MainPageLocators
 class TestMyTarget(BaseClass):
 
     def test_login(self):
-        self.login()
-        self.wait(MainPageLocators.TITLE)
-        title = self.find(MainPageLocators.TITLE)
+        self.base_page.login()
+        self.base_page.wait(MainPageLocators.TITLE)
+        title = self.base_page.find(MainPageLocators.TITLE)
         assert "С чего начать" in title.text
 
 
