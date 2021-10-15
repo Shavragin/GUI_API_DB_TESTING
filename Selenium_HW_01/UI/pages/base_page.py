@@ -1,4 +1,4 @@
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from Selenium_HW_01.UI.locators.basic_locators import LoginPageLocators
@@ -23,13 +23,16 @@ class BasePage(object):
     def clicking(self, locator, timeout=None):
         for i in range(CLICK):
             try:
-                self.find(locator)
                 button_is_clickable = self.wait(timeout).until(EC.element_to_be_clickable(locator))
                 button_is_clickable.click()
                 return
             except StaleElementReferenceException:
                 if i == CLICK - 1:
                     raise
+            except ElementClickInterceptedException:
+                if i == CLICK - 1:
+                    raise
+
 
     def login(self):
         # button = self.find(LoginPageLocators.ENTER_BUTTON)
