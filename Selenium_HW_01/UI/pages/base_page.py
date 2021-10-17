@@ -1,7 +1,8 @@
 from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from Selenium_HW_01.UI.locators.basic_locators import LoginPageLocators
+
 
 LOGIN = "Disclers2@yandex.ru"
 PASSWORD = "SwzsheYkXK+&-#7"
@@ -14,7 +15,7 @@ class BasePage(object):
 
     def wait(self, timeout=None):
         if timeout is None:
-            timeout = 5
+            timeout = 10
         return WebDriverWait(self.browser, timeout=timeout)
 
     def find(self, locator, timeout=None):
@@ -33,15 +34,13 @@ class BasePage(object):
                 if i == CLICK - 1:
                     raise
 
-
-    def login(self):
-        # button = self.find(LoginPageLocators.ENTER_BUTTON)
-        # button.click()
-        self.clicking(LoginPageLocators.ENTER_BUTTON)
+    def login(self, timeout=None):
+        self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
         email = self.find(LoginPageLocators.EMAIL_FIELD)
         email.send_keys(LOGIN)
         email_password = self.find(LoginPageLocators.PASSWORD_FIELD)
         email_password.send_keys(PASSWORD)
         self.clicking(LoginPageLocators.LOG_IN_BUTTON)
-        # log_in = self.browser.find_element(*LoginPageLocators.LOG_IN_BUTTON)
-        # log_in.click()
+
+    def element_is_disappeared(self, locator):
+        self.wait().until(EC.invisibility_of_element_located(locator))

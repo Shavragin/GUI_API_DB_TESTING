@@ -12,3 +12,9 @@ class DashboardPageLocators:
     EXIT = (By.CSS_SELECTOR, "[href='/logout']")
     AUDIENCE = (By.CSS_SELECTOR, "[class*='center-module-segments']")
     BILLING = (By.CSS_SELECTOR, "[class*='center-module-billing']")
+    PROFILE = (By.CSS_SELECTOR, "[href='/profile']")
+
+class ProfileInfoLocators:
+    FIO = (By.CSS_SELECTOR, "[data-name='fio'] > div > input")
+    MOBILE = (By.CSS_SELECTOR, "[data-name='phone'] > div > input")
+    SAVE = (By.CSS_SELECTOR, "button.button_submit > div")
