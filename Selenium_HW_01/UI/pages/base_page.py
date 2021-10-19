@@ -1,8 +1,9 @@
-from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException
+from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException, \
+    ElementNotInteractableException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from Selenium_HW_01.UI.locators.basic_locators import LoginPageLocators
 
+from Selenium_HW_01.UI.locators.basic_locators import LoginPageLocators
 
 LOGIN = "Disclers2@yandex.ru"
 PASSWORD = "SwzsheYkXK+&-#7"
@@ -24,13 +25,16 @@ class BasePage(object):
     def clicking(self, locator, timeout=None):
         for i in range(CLICK):
             try:
-                button_is_clickable = self.wait(timeout).until(EC.element_to_be_clickable(locator))
+                button_is_clickable = self.find(locator, timeout=timeout)
                 button_is_clickable.click()
                 return
             except StaleElementReferenceException:
                 if i == CLICK - 1:
                     raise
             except ElementClickInterceptedException:
+                if i == CLICK - 1:
+                    raise
+            except ElementNotInteractableException:
                 if i == CLICK - 1:
                     raise
 
