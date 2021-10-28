@@ -1,9 +1,14 @@
+import os
+
 import pytest
 from selenium import webdriver
 
 from Selenium_HW_01.UI.pages.base_page import BasePage
 from Selenium_HW_01.UI.pages.dashboard_page import DashboardPage
 from Selenium_HW_01.UI.pages.profile_page import ProfilePage
+
+hw_path = os.path.abspath(os.path.join(__file__, os.path.pardir))
+credential_path = os.path.join(hw_path, "UI", "user", "credentials.txt")
 
 
 def pytest_addoption(parser):
@@ -41,3 +46,11 @@ def dashboard_page(driver):
 @pytest.fixture
 def profile_page(driver):
     return ProfilePage(driver=driver)
+
+
+@pytest.fixture(scope="session")
+def credentials():
+    with open(credential_path, "r") as c:
+        user = c.readline().strip()
+        password = c.readline().strip()
+        return user, password

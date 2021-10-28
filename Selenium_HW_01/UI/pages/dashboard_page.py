@@ -6,5 +6,5 @@ class DashboardPage(BasePage):
 
     def exit_system(self):
         self.clicking(DashboardPageLocators.ACCOUNT)
-        self.find(DashboardPageLocators.EXIT)
-        self.clicking(DashboardPageLocators.EXIT)
+        button = self.find(DashboardPageLocators.EXIT)
+        self.browser.execute_script("arguments[0].click()", button)

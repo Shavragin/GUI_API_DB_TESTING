@@ -5,8 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from Selenium_HW_01.UI.locators.basic_locators import LoginPageLocators
 
-LOGIN = "Disclers2@yandex.ru"
-PASSWORD = "SwzsheYkXK+&-#7"
 CLICK = 3
 
 
@@ -25,25 +23,19 @@ class BasePage(object):
     def clicking(self, locator, timeout=None):
         for i in range(CLICK):
             try:
-                button_is_clickable = self.find(locator, timeout=timeout)
+                button_is_clickable = self.wait(timeout).until(EC.element_to_be_clickable(locator))
                 button_is_clickable.click()
                 return
-            except StaleElementReferenceException:
-                if i == CLICK - 1:
-                    raise
-            except ElementClickInterceptedException:
-                if i == CLICK - 1:
-                    raise
-            except ElementNotInteractableException:
+            except StaleElementReferenceException or ElementClickInterceptedException or ElementNotInteractableException:
                 if i == CLICK - 1:
                     raise
 
-    def login(self, timeout=None):
+    def login(self, user, password, timeout=None):
         self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
         email = self.find(LoginPageLocators.EMAIL_FIELD)
-        email.send_keys(LOGIN)
+        email.send_keys(user)
         email_password = self.find(LoginPageLocators.PASSWORD_FIELD)
-        email_password.send_keys(PASSWORD)
+        email_password.send_keys(password)
         self.clicking(LoginPageLocators.LOG_IN_BUTTON)
 
     def element_is_disappeared(self, locator):

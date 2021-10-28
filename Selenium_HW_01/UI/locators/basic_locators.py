@@ -11,7 +11,7 @@ class LoginPageLocators:
 class DashboardPageLocators:
     TITLE = (By.CSS_SELECTOR, "[class*='instruction-module-title']")
     ACCOUNT = (By.CSS_SELECTOR, "[class*='right-module-rightWrap']")
-    EXIT = (By.CSS_SELECTOR, "[href='/logout']")
+    EXIT = (By.XPATH, "//a[@href='/logout']")
     AUDIENCE = (By.CSS_SELECTOR, "[class*='center-module-segments']")
     BILLING = (By.CSS_SELECTOR, "[class*='center-module-billing']")
     PROFILE = (By.CSS_SELECTOR, "[href='/profile']")
@@ -21,4 +21,4 @@ class DashboardPageLocators:
 class ProfileInfoLocators:
     FIO = (By.CSS_SELECTOR, "[data-name='fio'] > div > input")
     MOBILE = (By.CSS_SELECTOR, "[data-name='phone'] > div > input")
-    SAVE = (By.CSS_SELECTOR, "button.button_submit > div")
+    SAVE = (By.CSS_SELECTOR, ".button_submit > div")

@@ -7,12 +7,12 @@ from Selenium_HW_01.base import BaseClass
 @pytest.mark.UI
 class TestMyTarget(BaseClass):
 
-    def test_login(self):
-        self.base_page.login()
+    def test_login(self, credentials):
+        self.base_page.login(*credentials)
         assert "dashboard" in self.browser.current_url, "User did not login"
 
-    def test_logout(self):
-        self.base_page.login()
+    def test_logout(self, credentials):
+        self.base_page.login(*credentials)
         self.dashboard_page.exit_system()
         assert "https://target.my.com/" == self.browser.current_url, "User did not logout"
 
@@ -21,13 +21,13 @@ class TestMyTarget(BaseClass):
                               pytest.param(DashboardPageLocators.BILLING, "billing")
                               ]
     )
-    def test_change_page(self, locator, expected):
-        self.base_page.login()
+    def test_change_page(self, locator, expected, credentials):
+        self.base_page.login(*credentials)
         self.base_page.clicking(locator)
         assert expected in self.browser.current_url, "Page did not change"
 
-    def test_change_info(self):
-        self.base_page.login()
+    def test_change_info(self, credentials):
+        self.base_page.login(*credentials)
         self.base_page.clicking(DashboardPageLocators.PROFILE)
         self.profile_page.send_info(ProfileInfoLocators.MOBILE, "8800")
         self.profile_page.send_info(ProfileInfoLocators.FIO)
