@@ -1,5 +1,4 @@
 import time
-import pytest
 from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException, \
     ElementNotInteractableException
 from selenium.webdriver.support import expected_conditions as EC
@@ -8,8 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from UI.locators.basic_locators import LoginPageLocators
 
 
-LOGIN = "Disclers2@yandex.ru"
-PASSWORD = "SwzsheYkXK+&-#7"
 CLICK = 3
 TIMEOUT = 10
 
@@ -43,8 +40,8 @@ class BasePage(object):
     def clicking(self, locator, timeout=None):
         for i in range(CLICK):
             try:
-                button_is_clickable = self.find(locator, timeout=timeout)
-                button_is_clickable.click()
+                self.find(locator)
+                self.wait(timeout=timeout).until(EC.element_to_be_clickable(locator)).click()
                 return
             except StaleElementReferenceException:
                 if i == CLICK - 1:
@@ -57,15 +54,27 @@ class BasePage(object):
                     raise
 
 
-    def login(self, timeout=None):
+    def login(self, user, password, timeout=None):
         self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
-        email = self.find(LoginPageLocators.EMAIL_FIELD)
-        email.send_keys(LOGIN)
-        email_password = self.find(LoginPageLocators.PASSWORD_FIELD)
-        email_password.send_keys(PASSWORD)
+        self.find(LoginPageLocators.EMAIL_FIELD).send_keys(user)
+        self.find(LoginPageLocators.PASSWORD_FIELD).send_keys(password)
         self.clicking(LoginPageLocators.LOG_IN_BUTTON)
 
+    def incorrect_login(self, user, password, timeout=None):
+        self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
+        self.find(LoginPageLocators.EMAIL_FIELD).send_keys(f"{user}y")
+        self.find(LoginPageLocators.PASSWORD_FIELD).send_keys(password)
+        self.clicking(LoginPageLocators.LOG_IN_BUTTON)
+
+    def incorrect_password(self, user, password, timeout=None):
+        self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
+        self.find(LoginPageLocators.EMAIL_FIELD).send_keys(f"{user}")
+        self.find(LoginPageLocators.PASSWORD_FIELD).send_keys(f"{password}1")
+        self.clicking(LoginPageLocators.LOG_IN_BUTTON)
 
 
     def element_is_disappeared(self, locator):
         self.wait().until(EC.invisibility_of_element_located(locator))
+
+    def scroll_to(self, element):
+        self.browser.execute_script('arguments[0].scrollIntoView(true);', element)

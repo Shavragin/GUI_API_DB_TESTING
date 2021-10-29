@@ -8,6 +8,8 @@ from UI.pages.dashboard_page import DashboardPage
 from UI.pages.profile_page import ProfilePage
 import sys, os, shutil
 
+dir_path = os.path.abspath(os.path.join(__file__, os.path.pardir))
+credential= os.path.join(dir_path, "UI", "credentials", "credentials.txt")
 
 def pytest_addoption(parser):
     parser.addoption("--url", default="https://target.my.com/")
@@ -86,17 +88,20 @@ def base_page(driver):
 
 
 @pytest.fixture
-def dashboard_page(driver):
-    return DashboardPage(driver=driver)
-
-
-@pytest.fixture
 def profile_page(driver):
     return ProfilePage(driver=driver)
 
+
 @pytest.fixture
-def dashboard(driver):
+def dashboard(driver, credentials):
     base_page = BasePage(driver)
-    base_page.login()
+    base_page.login(*credentials)
     return DashboardPage(driver)
 
+
+@pytest.fixture(scope="session")
+def credentials():
+    with open(credential) as c:
+        user = c.readline().strip()
+        password = c.readline().strip()
+    return user, password

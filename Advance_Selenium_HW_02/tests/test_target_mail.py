@@ -9,38 +9,29 @@ from base import BaseClass
 
 class TestMyTarget(BaseClass):
 
-    def test_login(self):
-        self.base_page.login()
-        assert "dashboard" in self.browser.current_url, "User did not login"
 
-    def test_logout(self, dashboard):
-        # self.base_page.login()
-        dashboard.exit_system()
-        assert "https://target.my.com/" == self.browser.current_url,  "User did not logout"
+    def test_create_company(self, dashboard, temp_dir):
+        create_page = dashboard.go_to_create_new_company()
+        company_name_create = create_page.fill_information(temp_dir)
+        create_page.create_company()
+        company_name_dashboard = dashboard.find_new_company()
+        assert company_name_create == company_name_dashboard
+
+    def test_incorrect_email(self, credentials):
+        self.base_page.incorrect_login(*credentials)
+        assert "https://account.my.com/login" in self.browser.current_url
+
+
+    def test_incorrect_password(self, credentials):
+        self.base_page.incorrect_password(*credentials)
+        assert "https://account.my.com/login" in self.browser.current_url
 
     @pytest.mark.UI
-    def test_create_company(self, dashboard):
-        dashboard.go_to_create_new_company
+    def test_create_segments(self, dashboard):
+        segments = dashboard.go_to_segments()
+        segments.create_segment()
         time.sleep(5)
-        # self.base_page.clicking(CreateCompanyPageLocators.REACH)
-        # time.sleep(5)
 
-    # @pytest.mark.parametrize(
-    #     "locator, expected", [pytest.param(DashboardPageLocators.AUDIENCE, "segments"),
-    #                           pytest.param(DashboardPageLocators.BILLING, "billing")
-    #                           ]
-    # )
-    # def test_change_page(self, locator, expected):
-    #     self.base_page.login()
-    #     self.base_page.clicking(locator)
-    #     assert expected in self.browser.current_url, "Page did not change"
-    #
-    # def test_change_info(self):
-    #     self.base_page.login()
-    #     self.base_page.clicking(DashboardPageLocators.PROFILE)
-    #     self.profile_page.send_info(ProfileInfoLocators.MOBILE, "8800")
-    #     self.profile_page.send_info(ProfileInfoLocators.FIO)
-    #     self.base_page.clicking(ProfileInfoLocators.SAVE)
-    #     self.base_page.browser.refresh()
-    #     new_name = self.base_page.find(DashboardPageLocators.USER_NAME)
-    #     assert self.profile_page.name.upper() == new_name.text, "User did not change profile info"
+
+
+
