@@ -1,23 +1,26 @@
+import logging
 import time
+
+import allure
 from selenium.common.exceptions import StaleElementReferenceException, ElementClickInterceptedException, \
-    ElementNotInteractableException
+    ElementNotInteractableException, NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-
-from UI.locators.basic_locators import LoginPageLocators
-
 
 CLICK = 3
 TIMEOUT = 10
 
+
 class PageNotLoadedException(Exception):
     pass
+
 
 class BasePage(object):
     url = "https://target.my.com/"
 
     def __init__(self, driver):
         self.browser = driver
+        self.logger = logging.getLogger('test')
         self.is_opened()
 
     def wait(self, timeout=None):
@@ -25,6 +28,7 @@ class BasePage(object):
             timeout = 10
         return WebDriverWait(self.browser, timeout=timeout)
 
+    @allure.step("Searching for {locator}")
     def find(self, locator, timeout=None):
         return self.wait(timeout).until(EC.presence_of_element_located(locator))
 
@@ -37,6 +41,7 @@ class BasePage(object):
         raise PageNotLoadedException(f"{self.url} did not open in {timeout} for {self.__class__.__name__}"
                                      f"current url {self.browser.current_url}")
 
+    @allure.step("Clicking on {locator}")
     def clicking(self, locator, timeout=None):
         for i in range(CLICK):
             try:
@@ -53,28 +58,16 @@ class BasePage(object):
                 if i == CLICK - 1:
                     raise
 
-
-    def login(self, user, password, timeout=None):
-        self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
-        self.find(LoginPageLocators.EMAIL_FIELD).send_keys(user)
-        self.find(LoginPageLocators.PASSWORD_FIELD).send_keys(password)
-        self.clicking(LoginPageLocators.LOG_IN_BUTTON)
-
-    def incorrect_login(self, user, password, timeout=None):
-        self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
-        self.find(LoginPageLocators.EMAIL_FIELD).send_keys(f"{user}y")
-        self.find(LoginPageLocators.PASSWORD_FIELD).send_keys(password)
-        self.clicking(LoginPageLocators.LOG_IN_BUTTON)
-
-    def incorrect_password(self, user, password, timeout=None):
-        self.clicking(LoginPageLocators.ENTER_BUTTON, timeout)
-        self.find(LoginPageLocators.EMAIL_FIELD).send_keys(f"{user}")
-        self.find(LoginPageLocators.PASSWORD_FIELD).send_keys(f"{password}1")
-        self.clicking(LoginPageLocators.LOG_IN_BUTTON)
-
+    def is_element_present(self, locator):
+        try:
+            self.browser.find_element(*locator)
+        except NoSuchElementException:
+            return False
+        return True
 
     def element_is_disappeared(self, locator):
         self.wait().until(EC.invisibility_of_element_located(locator))
 
+    @allure.step("Scrolling to {element}")
     def scroll_to(self, element):
         self.browser.execute_script('arguments[0].scrollIntoView(true);', element)

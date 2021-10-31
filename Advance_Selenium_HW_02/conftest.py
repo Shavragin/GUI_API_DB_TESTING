@@ -1,27 +1,32 @@
+import logging
+import os
+import shutil
+import sys
+
+import allure
 import pytest
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
+
 from UI.pages.base_page import BasePage
 from UI.pages.dashboard_page import DashboardPage
-from UI.pages.profile_page import ProfilePage
-import sys, os, shutil
+from UI.pages.login_page import LoginPage
 
 dir_path = os.path.abspath(os.path.join(__file__, os.path.pardir))
-credential= os.path.join(dir_path, "UI", "credentials", "credentials.txt")
+credential = os.path.join(dir_path, "UI", "credentials", "credentials.txt")
+
 
 def pytest_addoption(parser):
     parser.addoption("--url", default="https://target.my.com/")
     parser.addoption("--browser", default="chrome")
-    # parser.addoption("selenoid", action="store_true")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def config(request):
     url = request.config.getoption("--url")
     browser = request.config.getoption("--browser")
-    # selenide = request.config.getoption("--selenide")
 
     return {"url": url, "browser": browser}
 
@@ -59,6 +64,7 @@ def get_driver(config, download_dir=None):
 
     return browser
 
+
 def pytest_configure(config):
     if sys.platform.startswith("win"):
         base_path = "C://test"
@@ -82,20 +88,21 @@ def temp_dir(request):
     os.makedirs(test_dir)
     return test_dir
 
+
 @pytest.fixture
 def base_page(driver):
     return BasePage(driver=driver)
 
 
 @pytest.fixture
-def profile_page(driver):
-    return ProfilePage(driver=driver)
+def login_page(driver):
+    return LoginPage(driver=driver)
 
 
 @pytest.fixture
 def dashboard(driver, credentials):
-    base_page = BasePage(driver)
-    base_page.login(*credentials)
+    login_page = LoginPage(driver)
+    login_page.login(*credentials)
     return DashboardPage(driver)
 
 
@@ -105,3 +112,28 @@ def credentials():
         user = c.readline().strip()
         password = c.readline().strip()
     return user, password
+
+
+@pytest.fixture
+def logger(temp_dir, config):
+    log_formatter = logging.Formatter("%(asctime)s - %(filename)s - %(levelname)s - %(message)s")
+    log_file = os.path.join(temp_dir, "test.log")
+    log_level = logging.INFO
+
+    file_handler = logging.FileHandler(log_file, "w")
+    file_handler.setFormatter(log_formatter)
+    file_handler.setLevel(log_level)
+
+    log = logging.getLogger('test')
+    log.propagate = False
+    log.setLevel(log_level)
+    log.handlers.clear()
+    log.addHandler(file_handler)
+
+    yield log
+
+    for handler in log.handlers:
+        handler.close()
+
+    with open(log_file, "r") as f:
+        allure.attach(f.read(), "test.log", attachment_type=allure.attachment_type.TEXT)

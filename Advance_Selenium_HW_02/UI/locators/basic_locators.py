@@ -26,15 +26,13 @@ class ProfileInfoLocators:
     MOBILE = (By.CSS_SELECTOR, "[data-name='phone'] > div > input")
     SAVE = (By.CSS_SELECTOR, ".button_submit > div")
 
+
 class CreateCompanyPageLocators:
     REACH = (By.CSS_SELECTOR, "column-list-item._reach")
     COVERAGE = (By.CSS_SELECTOR, "[class*='right-wrap'] > [class*='column-list']  > [class*='_reach']")
     URL_ADVERTISE = (By.XPATH, "//input[@placeholder='Введите ссылку']")
     BANNER = (By.ID, "patterns_banner_4")
-    # UPLOAD_PICTURE = (By.XPATH, "//input[@data-test='overlay_240x400']")
-    # UPLOAD_PICTURE = (By.CSS_SELECTOR, "[data-test*='overlay']")
-    # UPLOAD_PICTURE = (By.CSS_SELECTOR, "overlay_240x400")
-    UPLOAD_PICTURE = (By.XPATH, "/html/body/div[1]/div[2]/div[1]/div/div[2]/div[2]/div[2]/div/div[1]/div[2]/div/div[4]/div[6]/div/div[3]/div/div/div[2]/div[1]/div[2]/div/div/div/div[2]/input")
+    UPLOAD_PICTURE = (By.CSS_SELECTOR, "[data-test*='image']")
     SAVE_PICTURE = (By.CSS_SELECTOR, "[class*='image-cropper__save']")
     SAVE_COMPANY = (By.CSS_SELECTOR, "[class*='footer__button js-save-button-wrap'] > button > div")
     COMPANY_NAME = (By.XPATH, "//div[@class='input input_campaign-name input_with-close']/div[2]/input")
@@ -43,8 +41,17 @@ class CreateCompanyPageLocators:
     BUDGET_PER_DAY = (By.CSS_SELECTOR, "[data-test= 'budget-per_day']")
     BUDGET_TOTAL = (By.CSS_SELECTOR, "[data-test= 'budget-total']")
 
+
 class SegmentPageLocators:
     CREATE_SEGMENT_MAIN = (By.XPATH, "//div[@class='page_segments__instruction-wrap js-instruction-wrap']//a")
+    CREATE_SEGMENT_IF_EXIST = (By.CSS_SELECTOR, "[class*='__btn']>button")
     CHECKBOX = (By.CSS_SELECTOR, "[class*='__checkbox']")
     ADD_SEGMENT = (By.CSS_SELECTOR, "[class*='__btn-wrap js-add'] > button > div")
     CREATE_SEGMENT_FINAL = (By.CSS_SELECTOR, "[class*='__btn-wrap js-create'] > button > div")
+    SEGMENT_NAME = (By.XPATH, "//div[@class='js-segment-name']//input")
+    SEGMENT_IN_TABLE = (By.CSS_SELECTOR, "[class*='cells-module-nameCell'] > a")
+    REMOVE_CELL = (By.CSS_SELECTOR, "[class*='remove']")
+    CONFIRM_DELETE = (By.CSS_SELECTOR, "[class*='button_confirm']")
+    CHECKBOX_SEGMENTS = (By.CSS_SELECTOR, "[class*='idCellCheckbox']")
+    ACTION_BUTTON = (By.CSS_SELECTOR, "[class*='selectItem']")
+    DELETE_ACTION = (By.CSS_SELECTOR, "[data-test='remove']")
