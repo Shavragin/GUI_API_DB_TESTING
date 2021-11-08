@@ -7,19 +7,19 @@ from base import BaseClass
 @pytest.mark.UI
 class TestMyTarget(BaseClass):
 
-    def test_create_company(self, dashboard, temp_dir):
-        create_page = dashboard.go_to_create_new_company()
+    def test_create_campaign(self, dashboard, temp_dir):
+        create_page = dashboard.go_to_create_new_campaign()
         create_page.fill_information(temp_dir)
-        create_page.create_company()
-        company_name_dashboard = dashboard.find_new_company()
-        assert create_page.company == company_name_dashboard, "Company have not created"
+        create_page.create_campaign()
+        campaign_name_dashboard = dashboard.find_new_campaign()
+        assert create_page.campaign == campaign_name_dashboard, "Campaign have not created"
 
     def test_create_segments(self, dashboard):
         segments = dashboard.go_to_segments()
         segments.create_segment()
         created = segments.name_created_segment()
         with soft_assertions():
-            assert_that(created).contains(segments.company_name)
+            assert_that(created).contains(segments.campaign_name)
             segments.delete_segment_checkbox()
 
     def test_delete_segment(self, dashboard):

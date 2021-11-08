@@ -27,15 +27,15 @@ class ProfileInfoLocators:
     SAVE = (By.CSS_SELECTOR, ".button_submit > div")
 
 
-class CreateCompanyPageLocators:
+class CreateCampaignPageLocators:
     REACH = (By.CSS_SELECTOR, "column-list-item._reach")
     COVERAGE = (By.CSS_SELECTOR, "[class*='right-wrap'] > [class*='column-list']  > [class*='_reach']")
-    URL_ADVERTISE = (By.XPATH, "//input[@placeholder='Введите ссылку']")
+    URL_ADVERTISE = (By.XPATH, "//input[@data-gtm-id='ad_url_text']")
     BANNER = (By.ID, "patterns_banner_4")
     UPLOAD_PICTURE = (By.CSS_SELECTOR, "[data-test*='image']")
     SAVE_PICTURE = (By.CSS_SELECTOR, "[class*='image-cropper__save']")
-    SAVE_COMPANY = (By.CSS_SELECTOR, "[class*='footer__button js-save-button-wrap'] > button > div")
-    COMPANY_NAME = (By.XPATH, "//div[@class='input input_campaign-name input_with-close']/div[2]/input")
+    SAVE_CAMPAIGN = (By.CSS_SELECTOR, "[class*='footer__button js-save-button-wrap'] > button > div")
+    CAMPAIGN_NAME = (By.XPATH, "//div[@class='input input_campaign-name input_with-close']/div[2]/input")
     DATE_FROM = (By.CSS_SELECTOR, "[class*='date-setting__date-from'] > input")
     DATE_TO = (By.CSS_SELECTOR, "[class*='date-setting__date-to'] > input")
     BUDGET_PER_DAY = (By.CSS_SELECTOR, "[data-test= 'budget-per_day']")

@@ -6,21 +6,21 @@ import allure
 import numpy
 from PIL import Image
 
-from UI.locators.basic_locators import CreateCompanyPageLocators
+from UI.locators.basic_locators import CreateCampaignPageLocators
 from UI.pages.base_page import BasePage
 
 
 def date():
     today = datetime.date.today()
-    return f"{today.day}.{today.month}.{today.year}"
+    return f"{today.day:02}.{today.month:02}.{today.year}"
 
 
 def random_url():
-    return f"http://company{random.randint(0, 1000)}.ru"
+    return f"http://campaign{random.randint(0, 1000)}.ru"
 
 
-def random_company():
-    return f"Company{random.randint(0, 100000)}"
+def random_campaign():
+    return f"Campaign{random.randint(0, 100000)}"
 
 
 def create_image(temp_dir):
@@ -31,14 +31,14 @@ def create_image(temp_dir):
     return dir
 
 
-class CreateCompanyPage(BasePage):
+class CreateCampaignPage(BasePage):
     url = "https://target.my.com/campaign/new"
-    locator = CreateCompanyPageLocators()
+    locator = CreateCampaignPageLocators()
 
-    @allure.step("Creating company")
-    def create_company(self, ):
+    @allure.step("Creating campaign")
+    def create_campaign(self, ):
         self.logger.info("Save company")
-        self.clicking(self.locator.SAVE_COMPANY)
+        self.clicking(self.locator.SAVE_CAMPAIGN)
 
     def fill_random_url(self):
         self.logger.info("Adding URL")
@@ -70,11 +70,11 @@ class CreateCompanyPage(BasePage):
         self.find(self.locator.BUDGET_PER_DAY).send_keys("100")
         self.find(self.locator.BUDGET_TOTAL).send_keys("100")
 
-    def fill_random_company(self):
+    def fill_random_campaign(self):
         self.logger.info("Adding company name")
-        self.find(self.locator.COMPANY_NAME).clear()
-        self.company = random_company()
-        self.find(self.locator.COMPANY_NAME).send_keys(self.company)
+        self.find(self.locator.CAMPAIGN_NAME).clear()
+        self.campaign = random_campaign()
+        self.find(self.locator.CAMPAIGN_NAME).send_keys(self.campaign)
 
     @allure.step("Filling information")
     def fill_information(self, temp_dir):
@@ -83,4 +83,4 @@ class CreateCompanyPage(BasePage):
         self.upload_picture(temp_dir)
         self.fill_date()
         self.fill_budget()
-        self.fill_random_company()
+        self.fill_random_campaign()
