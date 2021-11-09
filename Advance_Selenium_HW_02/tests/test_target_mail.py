@@ -19,7 +19,7 @@ class TestMyTarget(BaseClass):
         segments.create_segment()
         created = segments.name_created_segment()
         with soft_assertions():
-            assert_that(created).contains(segments.campaign_name)
+            assert_that(created).contains(segments.new_name)
             segments.delete_segment_checkbox()
 
     def test_delete_segment(self, dashboard):
