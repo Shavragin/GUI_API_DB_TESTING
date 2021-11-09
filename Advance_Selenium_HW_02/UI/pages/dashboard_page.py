@@ -11,12 +11,12 @@ class DashboardPage(BasePage):
     locator = DashboardPageLocators()
 
     def go_to_create_new_campaign(self):
-        self.clicking(DashboardPageLocators.CREATE_COMPANY)
+        self.clicking(DashboardPageLocators.CREATE_CAMPAIGN)
         return CreateCampaignPage(self.browser)
 
     def find_new_campaign(self):
-        company = self.find(self.locator.CREATED_COMPANY)
-        return company.get_attribute("title")
+        campaign = self.find(self.locator.CREATED_CAMPAIGN)
+        return campaign.get_attribute("title")
 
     @allure.step("Going to segments")
     def go_to_segments(self):

@@ -28,10 +28,10 @@ class SegmentsPage(BasePage):
             self.clicking(self.locators.CREATE_SEGMENT_IF_EXIST)
 
     def filling_campaign_name(self):
-        self.logger.info("Filling new company")
-        new_company_field = self.find(self.locators.SEGMENT_NAME)
+        self.logger.info("Filling new campaign")
+        new_campaign_field = self.find(self.locators.SEGMENT_NAME)
         self.campaign_name = f"Campaign{random.randint(0, 1000)}"
-        new_company_field.send_keys(self.campaign_name)
+        new_campaign_field.send_keys(self.campaign_name)
 
     def picking_segment_type(self):
         self.logger.info("Picking segment type")

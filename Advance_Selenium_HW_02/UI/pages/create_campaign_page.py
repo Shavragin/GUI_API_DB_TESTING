@@ -37,7 +37,7 @@ class CreateCampaignPage(BasePage):
 
     @allure.step("Creating campaign")
     def create_campaign(self, ):
-        self.logger.info("Save company")
+        self.logger.info("Save campaign")
         self.clicking(self.locator.SAVE_CAMPAIGN)
 
     def fill_random_url(self):
@@ -71,7 +71,7 @@ class CreateCampaignPage(BasePage):
         self.find(self.locator.BUDGET_TOTAL).send_keys("100")
 
     def fill_random_campaign(self):
-        self.logger.info("Adding company name")
+        self.logger.info("Adding campaign name")
         self.find(self.locator.CAMPAIGN_NAME).clear()
         self.campaign = random_campaign()
         self.find(self.locator.CAMPAIGN_NAME).send_keys(self.campaign)
