@@ -4,9 +4,9 @@ from assertpy import soft_assertions, assert_that
 from base import BaseClass
 
 
-# @pytest.mark.UI
+@pytest.mark.UI
 class TestMyTarget(BaseClass):
-    @pytest.mark.UI
+
     def test_create_campaign(self, dashboard, temp_dir):
         create_page = dashboard.go_to_create_new_campaign()
         create_page.fill_information(temp_dir)
