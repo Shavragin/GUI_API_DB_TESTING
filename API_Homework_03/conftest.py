@@ -9,20 +9,18 @@ import pytest
 from API.client import ApiClient
 
 dir_path = os.path.abspath(os.path.join(__file__, os.path.pardir))
-credential = os.path.join(dir_path, "credentials", "credentials.txt")
+credential = os.path.join(dir_path, "test_api/credentials", "credentials.txt")
 
 
 def pytest_addoption(parser):
     parser.addoption("--url", default="https://auth-ac.my.com/auth")
-    parser.addoption("--browser", default="chrome")
 
 
 @pytest.fixture(scope="session")
 def config(request):
     url = request.config.getoption("--url")
-    browser = request.config.getoption("--browser")
 
-    return {"url": url, "browser": browser}
+    return {"url": url}
 
 
 def pytest_configure(config):

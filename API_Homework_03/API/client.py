@@ -1,12 +1,17 @@
 import json
 import os
 from urllib.parse import urljoin
+from utils.data import data_create_campaign, data_create_segment
 
 import requests
 from requests.cookies import cookiejar_from_dict
 
 
 class CookieDoNotSetException(Exception):
+    pass
+
+
+class EmptySegmentListException(Exception):
     pass
 
 
@@ -28,16 +33,12 @@ class ApiClient:
         self.csrf_token = None
 
     def post_headers_auth(self):
-        return {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) /'
-                              'Chrome/93.0.4577.82 YaBrowser/21.9.2.169 Yowser/2.5 Safari/537.36',
-                'Content-Type': 'application/x-www-form-urlencoded',
+        return {
                 'Referer': 'https://account.my.com/'
                 }
 
     def post_headers_target(self):
-        return {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) /'
-                              'Chrome/93.0.4577.82 YaBrowser/21.9.2.169 Yowser/2.5 Safari/537.36',
-                # 'Content-Type': 'application/json',
+        return {
                 'Host': 'target.my.com'
                 }
 
@@ -49,7 +50,6 @@ class ApiClient:
             'password': self.password,
             'continue': 'https://account.my.com/login_continue/?continue=https%3A%2F%2Faccount.my.com%2Fprofile%2Fuserinfo%2F',
             'failure': 'https://account.my.com/login/?continue=https%3A%2F%2Faccount.my.com%2Fprofile%2Fuserinfo%2F',
-            'nosavelogin': 0
         }
 
         response = self.session.request('POST', self.url, headers=headers, data=payload,
@@ -76,25 +76,21 @@ class ApiClient:
         headers = self.post_headers_target()
         headers['X-CSRFToken'] = self.csrf_token
 
-        data = json.dumps({
-            'name': f'{segment_name}',
-            'pass_condition': 1,
-            'logicType': 'or',
-            "relations": [{"object_type": "remarketing_player",
-                           "params": {"type": "positive", "left": 365, "right": 0}}],
-        })
+        data = json.dumps(data_create_segment(segment_name))
 
-        response = self.session.post(urljoin(self.target_url, location), headers=headers, data=data)
-        return response
+        return self.session.post(urljoin(self.target_url, location), headers=headers, data=data)
 
-    def delete_segment(self, segment_name):
+
+    def delete_first_segment(self):
         headers = self.post_headers_target()
         headers['X-CSRFToken'] = self.csrf_token
-        response = self.create_segment(segment_name)
-        id = response.json().get('id')
-        location = f'api/v2/remarketing/segments/{id}.json'
-
-        return self.session.delete(urljoin(self.target_url, location), headers=headers)
+        try:
+            id = self.get_segment()
+            location = f'api/v2/remarketing/segments/{id}.json'
+        except EmptySegmentListException as e:
+            print(e)
+        else:
+            return self.session.delete(urljoin(self.target_url, location), headers=headers)
 
     def post_image(self, dir):
         location_content = 'api/v2/content/static.json'
@@ -128,46 +124,50 @@ class ApiClient:
 
         id = self.post_image(temp_dir)
 
-        campaign_objective = self.session.request('GET', urljoin(self.target_url,
-                                                                 '/api/v2/campaign_objective/reach/urls.json?_=1636300089249'),
-                                                  headers=headers)
+        campaign_objective = self.make_campaign_url()
 
         primary_id = campaign_objective.json().get('items')[0].get('id')
 
-        data = {
-            "name": name,
-            "read_only": False,
-            "conversion_funnel_id": None,
-            "objective": "reach",
-            "targetings": {"split_audience": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "sex": ["male", "female"],
-                           "age": {
-                               "age_list": [0, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                                            30, 31, 32, 33,
-                                            34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52,
-                                            53, 54, 55,
-                                            56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
-                                            75]}},
-            "autobidding_mode": "max_shows",
-            "uniq_shows_period": "day",
-            "budget_limit_day": "100",
-            "budget_limit": "100",
-            "mixing": "recommended",
-            "enable_utm": True,
-            "price": "21",
-            "max_price": "0",
-            "package_id": 960,
-            "banners": [
-                {"urls": {"primary": {"id": f'{primary_id}'}}, "textblocks": {},
-                 "content": {"image_240x400": {"id": f'{id}'}},
-                 "name": ""}]
-        }
+        data = data_create_campaign(name, primary_id, id)
 
         response_create = self.session.request('POST', urljoin(self.target_url, location), headers=headers, json=data)
-        self.id_campaign = response_create.json().get('id')
-        return response_create
+        return response_create.json().get('id')
 
-    def delete_campaign(self):
-        location = f'/api/v2/campaigns/{self.id_campaign}.json'
+
+    def delete_campaign(self, id):
         headers = self.post_headers_target()
         headers['X-CSRFToken'] = self.csrf_token
+        location = f'/api/v2/campaigns/{id}.json'
         return self.session.request('DELETE', urljoin(self.target_url, location), headers=headers)
+
+    def get_segment(self):
+        location = 'https://target.my.com/api/v2/remarketing/segments.json?fields=id'
+        headers = self.post_headers_target()
+        headers['X-CSRFToken'] = self.csrf_token
+        response = self.session.request('GET', urljoin(self.target_url, location), headers=headers)
+        try:
+            id = response.json().get('items')[0]['id']
+        except IndexError:
+            raise EmptySegmentListException('There are not segments')
+        else:
+            return id
+
+    def make_campaign_url(self):
+        headers = self.post_headers_target()
+        return self.session.request('GET', urljoin(self.target_url, "api/v1/urls/?url=https.github.com"), headers=headers).json()['id']
+
+
+
+a = ApiClient("https://auth-ac.my.com/auth", "Disclers2@yandex.ru", "SwzsheYkXK+&-#7")
+
+a.login()
+
+a.make_campaign_url()
+
+
+
+# try:
+#     a.get_segment()
+# except EmptySegmentListException as e:
+#     print(e)
+
