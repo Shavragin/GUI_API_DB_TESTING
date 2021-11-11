@@ -23,6 +23,6 @@ class TestMyTarget(ApiBase):
     def test_create_campaign(self):
         name = create_name()
         create_id = self.create_campaign_base(name).json().get('id')
-        get_id = self.get_created_campaign_base().json().get('id')
+        get_id = self.get_created_campaign_base(create_id).json().get('id')
         assert create_id == get_id, "Campaign was not created"
-        self.api_client.delete_campaign()
+        self.delete_campaign_base(id=create_id)

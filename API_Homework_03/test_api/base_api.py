@@ -26,5 +26,8 @@ class ApiBase:
     def get_segment_list_base(self):
         return self.api_client.get_segments_list()
 
-    def get_created_campaign_base(self):
-        return self.api_client.get_created_campaign()
+    def get_created_campaign_base(self, id):
+        return self.api_client.get_created_campaign(id)
+
+    def delete_campaign_base(self, id=None):
+        return self.api_client.delete_campaign(id=id)

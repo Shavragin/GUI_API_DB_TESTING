@@ -3,7 +3,6 @@ import os
 from urllib.parse import urljoin
 
 import requests
-from requests.cookies import cookiejar_from_dict
 
 from utils.data import data_create_campaign, data_create_segment
 
@@ -45,21 +44,13 @@ class ApiClient:
             'failure': 'https://account.my.com/login/?continue=https%3A%2F%2Faccount.my.com%2Fprofile%2Fuserinfo%2F',
         }
 
-        response = self.session.request('POST', self.login_url, headers=headers, data=payload,
-                                        allow_redirects=True)
+        self.session.request('POST', self.login_url, headers=headers, data=payload,
+                             allow_redirects=True)
 
-        response_cookies = response.history[0]
-        set_cookie = response_cookies.headers.get('Set-Cookie').split(';')
         csrf_cookie = self.session.get(f'{self.target_url}csrf', headers=headers, allow_redirects=True).headers.get(
             'set-cookie').split(";")
+
         self.csrf_token = [c for c in csrf_cookie if 'csrf' in c][0].split('=')[-1]
-        self.mc_cookie = [m for m in set_cookie if 'mc' in m][0].split('=')[-1]
-        self.ssdc_cookie = [s for s in set_cookie if 'sdc' in s][0].split(',')[1].split('=')[-1]
-        self.session.cookies = cookiejar_from_dict({
-            'mc': self.mc_cookie,
-            'ssdc': self.ssdc_cookie,
-            'csrftoken': self.csrf_token
-        })
 
         return self.session.get(self.target_url, headers=headers, allow_redirects=True)
 
@@ -122,20 +113,32 @@ class ApiClient:
 
         response_create_campaign = self.session.request('POST', urljoin(self.target_url, location), headers=headers,
                                                         json=data)
-        self.campaign_id = response_create_campaign.json().get('id')
         return response_create_campaign
 
-    def get_created_campaign(self):
-        location = f'api/v2/campaigns/{self.campaign_id}.json'
+    def get_created_campaign(self, id):
+        location = f'api/v2/campaigns/{id}.json'
         headers = self.post_headers_target()
         return self.session.request('GET', urljoin(self.target_url, location), headers=headers)
 
+    def get_active_campaigns(self):
+        location = f'api/v2/campaigns.json?fields=id&_status__in=active'
+        headers = self.post_headers_target()
+        return self.session.request('GET', urljoin(self.target_url, location), headers=headers).json().get('items')
 
-    def delete_campaign(self):
+    def delete_campaign(self, id=None):
         headers = self.post_headers_target()
         headers['X-CSRFToken'] = self.csrf_token
-        location = f'/api/v2/campaigns/{self.campaign_id}.json'
-        return self.session.request('DELETE', urljoin(self.target_url, location), headers=headers)
+        if id is None:
+            try:
+                finded_id = self.get_active_campaigns()[0].get('id')
+            except IndexError:
+                raise EmptySegmentListException('There are not active campaigns')
+
+            location = f'/api/v2/campaigns/{finded_id}.json'
+            return self.session.request('DELETE', urljoin(self.target_url, location), headers=headers)
+        else:
+            location = f'/api/v2/campaigns/{id}.json'
+            return self.session.request('DELETE', urljoin(self.target_url, location), headers=headers)
 
     def get_first_segment(self):
         response = self.get_segments_list()
