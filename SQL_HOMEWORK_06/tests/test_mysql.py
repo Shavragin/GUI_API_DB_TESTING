@@ -1,5 +1,6 @@
 from tests.base import BuilderBase
-from utils.parser import most_callable_url, most_5_4xx_url
+from utils.parser import most_callable_url, most_5_4xx_url, most_5_5xx_ip
+
 
 class TestMySQL(BuilderBase):
 
@@ -11,7 +12,12 @@ class TestMySQL(BuilderBase):
     def prepare_sizes(self):
         sizes = most_5_4xx_url()
         for i in sizes:
-            self.mysql_builder.create_400_quantity(i, i[1][0], i[1][1], i[2])
+            self.mysql_builder.create_400_quantity(i[0], i[1][0], i[1][1], i[2])
+
+    def prepare_ips(self):
+        ips = most_5_5xx_ip()
+        for i in ips:
+            self.mysql_builder.create_500_quantity(i[0], i[1])
 
     def test_strings_counter(self):
         self.mysql_builder.create_quantity()
@@ -32,3 +38,8 @@ class TestMySQL(BuilderBase):
         self.prepare_sizes()
         sizes_table = self.get_size_quantity()
         assert len(sizes_table) == 5
+
+    def test_most_500_ip(self):
+        self.prepare_ips()
+        ips_table = self.get_500_quantity()
+        assert len(ips_table) == 5

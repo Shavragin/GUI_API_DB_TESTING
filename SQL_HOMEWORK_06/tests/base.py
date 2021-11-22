@@ -1,20 +1,16 @@
 import pytest
 
-from model.model import CallCount, TypeCount, MostCallableURL, FiveBig400
+from model.model import CallCount, TypeCount, MostCallableURL, FiveBig400, FiveBig500
 from orm_client.client import MysqlOpmClient
 from utils.builder import MysqlORMBuilder
 
-class BuilderBase:
 
-    # def prepare_urls(self):
-    #     pass
+class BuilderBase:
 
     @pytest.fixture(autouse=True)
     def setup(self, mysql_orm_client):
         self.mysql: MysqlOpmClient = mysql_orm_client
         self.mysql_builder: MysqlORMBuilder = MysqlORMBuilder(self.mysql)
-
-        # self.prepare_urls()
 
     def get_counter(self):
         self.mysql.session.commit()
@@ -36,4 +32,7 @@ class BuilderBase:
         sizes = self.mysql.session.query(FiveBig400)
         return sizes.all()
 
-
+    def get_500_quantity(self):
+        self.mysql.session.commit()
+        sizes = self.mysql.session.query(FiveBig500)
+        return sizes.all()

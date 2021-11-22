@@ -1,5 +1,6 @@
-from model.model import CallCount, TypeCount, MostCallableURL, FiveBig400
+from model.model import CallCount, TypeCount, MostCallableURL, FiveBig400, FiveBig500
 from utils.parser import get_calls_quantity, obtain_type_quantity
+
 
 class MysqlORMBuilder:
 
@@ -52,6 +53,11 @@ class MysqlORMBuilder:
         self.client.session.commit()
         return five_big400
 
+    def create_500_quantity(self, ip, quantity):
+        five_big500 = FiveBig500(
+            ip=ip,
+            quantity=quantity
+        )
 
-
-
+        self.client.session.add(five_big500)
+        self.client.session.commit()

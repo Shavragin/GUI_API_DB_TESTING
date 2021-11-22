@@ -1,7 +1,9 @@
 import sqlalchemy
 from sqlalchemy import inspect
 from sqlalchemy.orm import sessionmaker
+
 from model.model import Base
+
 
 class MysqlOpmClient:
 
@@ -22,7 +24,6 @@ class MysqlOpmClient:
 
         session = sessionmaker(bind=self.connection.engine)
         self.session = session()
-
 
     def execute_query(self, query, fetch=True):
         result = self.connection.execute(query)
@@ -53,8 +54,6 @@ class MysqlOpmClient:
         if not inspect(self.engine).has_table('five_big400'):
             Base.metadata.tables['five_big400'].create(self.engine)
 
-
-
-
-
-
+    def create_five500(self):
+        if not inspect(self.engine).has_table('five_big500'):
+            Base.metadata.tables['five_big500'].create(self.engine)
