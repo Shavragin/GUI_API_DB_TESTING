@@ -23,6 +23,7 @@ class ApiClient:
         self.username = username
         self.password = password
         self.target_url = 'https://target.my.com/'
+        self.csrf_token = None
 
     def post_headers_auth(self):
         return {
@@ -47,12 +48,13 @@ class ApiClient:
         self.session.request('POST', self.login_url, headers=headers, data=payload,
                              allow_redirects=True)
 
-        csrf_cookie = self.session.get(f'{self.target_url}csrf', headers=headers, allow_redirects=True).headers.get(
-            'set-cookie').split(";")
-
-        self.csrf_token = [c for c in csrf_cookie if 'csrf' in c][0].split('=')[-1]
-
         return self.session.get(self.target_url, headers=headers, allow_redirects=True)
+
+    def get_csrf_token(self):
+        self.login()
+        headers = self.post_headers_auth()
+        self.session.request('GET', f'{self.target_url}csrf', headers=headers, allow_redirects=True)
+        self.csrf_token = self.session.cookies.get('csrftoken')
 
     def create_segment(self, segment_name):
         location = 'api/v2/remarketing/segments.json?fields=name,pass_condition,created,id'
@@ -150,7 +152,7 @@ class ApiClient:
             return id
 
     def get_segments_list(self):
-        location = 'https://target.my.com/api/v2/remarketing/segments.json?fields=id'
+        location = 'api/v2/remarketing/segments.json?fields=id&limit=500'
         headers = self.post_headers_target()
         headers['X-CSRFToken'] = self.csrf_token
         return self.session.request('GET', urljoin(self.target_url, location), headers=headers)
@@ -159,3 +161,18 @@ class ApiClient:
         headers = self.post_headers_target()
         return self.session.request('GET', urljoin(self.target_url, "api/v1/urls/?url=https.github.com"),
                                     headers=headers).json()['id']
+
+    def check_segments(self, segment_id, segment_list):
+        if any(item.get('id') == segment_id for item in segment_list):
+            return True
+        return False
+
+
+if __name__ == '__main__':
+    a = ApiClient('https://auth-ac.my.com/auth', 'Disclers2@yandex.ru', 'SwzsheYkXK+&-#7')
+    a.login()
+    a.get_csrf_token()
+    id = a.create_segment("sdfgsf").json()['id']
+    list = a.get_segments_list().json()['items']
+    print(a.check_segments(id, list))
+

@@ -10,6 +10,7 @@ class ApiBase:
 
         if self.authorize:
             self.api_client.login()
+            self.api_client.get_csrf_token()
 
     def create_segment_base(self, name):
         return self.api_client.create_segment(name)
