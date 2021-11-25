@@ -31,3 +31,4 @@ platformdirs~=2.4.0
 selenium~=3.141.0
 Pillow~=8.4.0
 assertpy~=1.1
+Faker~=9.8.0
