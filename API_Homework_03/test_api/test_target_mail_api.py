@@ -9,20 +9,20 @@ class TestMyTarget(ApiBase):
 
     def test_create_segment(self):
         name = create_name()
-        response = self.create_segment_base(name)
+        response = self.api_client.create_segment(name)
         assert response.json().get('name') == name, "Segment was not created"
 
     def test_delete_segment(self):
         name = create_name()
-        segments_before = len(self.get_segment_list_base().json().get('items'))
-        self.create_segment_base(name)
-        self.delete_first_segment_base()
-        segments_after = len(self.get_segment_list_base().json().get('items'))
-        assert segments_before == segments_after, "Segment was not deleted"
+        id = self.api_client.create_segment(name).json()['id']
+        self.api_client.delete_segment(id)
+        segments_list = self.api_client.get_segments_list().json()['items']
+
+        assert self.api_client.check_segments(id, segments_list) is False, "Segment was not deleted"
 
     def test_create_campaign(self):
         name = create_name()
-        create_id = self.create_campaign_base(name).json().get('id')
-        get_id = self.get_created_campaign_base(create_id).json().get('id')
+        create_id = self.api_client.create_campaign(name).json().get('id')
+        get_id = self.api_client.get_created_campaign(create_id).json().get('id')
         assert create_id == get_id, "Campaign was not created"
-        self.delete_campaign_base(id=create_id)
+        self.api_client.delete_campaign(id=create_id)

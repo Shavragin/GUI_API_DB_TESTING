@@ -51,7 +51,6 @@ class ApiClient:
         return self.session.get(self.target_url, headers=headers, allow_redirects=True)
 
     def get_csrf_token(self):
-        self.login()
         headers = self.post_headers_auth()
         self.session.request('GET', f'{self.target_url}csrf', headers=headers, allow_redirects=True)
         self.csrf_token = self.session.cookies.get('csrftoken')
@@ -66,11 +65,11 @@ class ApiClient:
 
         return self.session.post(urljoin(self.target_url, location), headers=headers, data=data)
 
-    def delete_first_segment(self):
+    def delete_segment(self, id):
         headers = self.post_headers_target()
         headers['X-CSRFToken'] = self.csrf_token
         try:
-            id = self.get_first_segment()
+            # id = self.get_first_segment()
             location = f'api/v2/remarketing/segments/{id}.json'
         except EmptySegmentListException as e:
             print(e)
@@ -166,13 +165,3 @@ class ApiClient:
         if any(item.get('id') == segment_id for item in segment_list):
             return True
         return False
-
-
-if __name__ == '__main__':
-    a = ApiClient('https://auth-ac.my.com/auth', 'Disclers2@yandex.ru', 'SwzsheYkXK+&-#7')
-    a.login()
-    a.get_csrf_token()
-    id = a.create_segment("sdfgsf").json()['id']
-    list = a.get_segments_list().json()['items']
-    print(a.check_segments(id, list))
-
