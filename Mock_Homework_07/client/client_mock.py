@@ -1,4 +1,7 @@
+import json
 import socket
+
+import requests
 
 from settings import MOCK_PORT, MOCK_HOST
 
@@ -46,3 +49,14 @@ class SocketClient:
         client.send(request.encode())
         data = self.listener(client)
         return data
+
+    def client_post(self, name):
+        headers = {'Content-Type': 'application/json'}
+        data = json.dumps({'name': name})
+
+        return requests.post('http://127.0.0.1:1234/post_new_user_status', headers=headers, data=data)
+
+    def client_put(self, name, status):
+        headers = {'Content-Type': 'application/json'}
+        data = json.dumps({'name': name, 'status': status})
+        return requests.put('http://127.0.0.1:1234/change_status_user', headers=headers, data=data)

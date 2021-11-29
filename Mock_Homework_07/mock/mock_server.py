@@ -23,7 +23,7 @@ def get_status(nickname):
         }
         return jsonify(data), 200
     else:
-        return jsonify('Account does not exist, please create account and login in'), 404
+        return jsonify({'error': 'Account does not exist, please create account and login in'}), 404
 
 
 @app.route('/post_new_user_status', methods=['POST'])
@@ -31,7 +31,7 @@ def post_new_login_status():
     nickname = json.loads(request.data)['name']
 
     if nickname in is_login_data:
-        return jsonify('Account already exist, use put method to change status of exist user'), 404
+        return jsonify({'error':'Account already exist, use put method to change status of exist user'}), 404
     else:
         is_login_data[nickname] = 'True'
         return jsonify({nickname: is_login_data[nickname]}), 201
@@ -46,7 +46,7 @@ def change_login_status():
 
         return jsonify({nickname: is_login_data[nickname]}), 200
     else:
-        return jsonify('User was not created, please use post request to create new user'), 404
+        return jsonify({'error':'User was not created, please use post request to create new user'}), 404
 
 
 @app.route('/delete_user/<nickname>', methods=['DELETE'])
@@ -55,7 +55,7 @@ def delete_nickname(nickname):
         is_login_data.pop(nickname)
         return jsonify(is_login_data), 200
     else:
-        return jsonify("User is not is login list"), 400
+        return jsonify({'error': 'User is not is login list'}), 400
 
 
 def shutdown_stub():
